@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from django.utils import timezone
 
 
@@ -15,13 +16,13 @@ class Task(models.Model):
     performers = models.CharField(max_length=255, blank=True)  # Список исполнителей в виде строки
     created_at = models.DateTimeField(default=timezone.now)  # Дата и время создания
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="assigned")  # Статус 
-    planned_effort = models.FloatField(default=0.0)  # Плановая трудоёмкость, к примеру, в часах
-    actual_effort = models.FloatField(default=0.0)  # Фактическое время выполнения
+    planned_effort = models.FloatField(default=0.0)  # Плановое время выполнения
+    actual_effort = models.FloatField(default=0.0)  # Фактическое время
     completed_at = models.DateTimeField(null=True, blank=True)
 
     parent = models.ForeignKey(
         "self", related_name="subtasks", on_delete=models.CASCADE, null=True, blank=True
-    )  # Ссылка на родительскую задачу, если задача является подзадачей
+    )  # Ссылка на родительскую задачу, если это подзадача
 
     def __str__(self):
         return self.name
@@ -29,7 +30,7 @@ class Task(models.Model):
     def calculate_efforts(self) -> dict: 
         subtask_planned_effort = sum(
             subtask.planned_effort for subtask in self.subtasks.all()
-        )  # Вычисление суммарной плановой трудоёмкости всех подзадач
+        )  # Вычисление суммарного планового время выполнения всех подзадач
         subtask_actual_effort = sum(
             subtask.actual_effort for subtask in self.subtasks.all()
         )  # Вычисление суммарного фактического времени выполнения всех подзадач
