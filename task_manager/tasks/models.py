@@ -38,7 +38,7 @@ class Task(models.Model):
             "actual_effort": self.actual_effort + subtask_actual_effort,
         }
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # Сохрание/обновление статуса задачи 
         if self.status == "completed" and not self.completed_at:
             self.completed_at = timezone.now()
         elif self.status != "completed":

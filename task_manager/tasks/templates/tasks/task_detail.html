@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ task.name }}</title>
+</head>
+<body>
+    <h1>{{ task.name }}</h1>
+    <p>{{ task.description }}</p>
+    <p>Status: {{ task.get_status_display }}</p>
+    <p>Planned Effort: {{ task.planned_effort }}</p>
+    <p>Actual Effort: {{ task.actual_effort }}</p>
+    <p>Created At: {{ task.created_at }}</p>
+    <p>Completed At: {{ task.completed_at }}</p>
+    <a href="{% url 'edit_task' task.pk %}">Edit</a>
+    <a href="{% url 'delete_task' task.pk %}">Delete</a>
+    <a href="{% url 'task_list' %}">Back to List</a>
+</body>
+</html>
