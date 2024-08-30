@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block header %}
     <title>Удалить задачу</title>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
     <h2>Удалить задачу</h2>
     <p>Вы уверены, что хотите удалить "{{ object.name }}"?</p>
     <form method="post">
@@ -11,5 +12,4 @@
         <button type="submit">Удалить</button>
     </form>
     <a href="{% url 'task_list' %}">Отмена</a>
-</body>
-</html>
+{% endblock %}

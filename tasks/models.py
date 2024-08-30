@@ -39,6 +39,14 @@ class Task(models.Model):
             "actual_effort": self.actual_effort + subtask_actual_effort,
         }
 
+    @property
+    def calculated_planned_effort(self):
+        return self.calculate_efforts()['planned_effort']
+
+    @property
+    def calculated_actual_effort(self):
+        return self.calculate_efforts()['actual_effort']
+
     def save(self, *args, **kwargs):  # Сохрание/обновление статуса задачи 
         if self.status == "completed" and not self.completed_at:
             self.completed_at = timezone.now()
@@ -49,3 +57,7 @@ class Task(models.Model):
             if self.status == "completed":
                 subtask.status = "completed"
                 subtask.save()
+
+    def is_terminal(self):
+        """Проверяет, является ли задача терминальной (т.е. не имеет подзадач)."""
+        return not self.subtasks.exists()

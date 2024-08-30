@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <title>Удалить задачу</title>
+{% endblock %}
+
+{% block content %}
+    <h1>Подтвердите удаление</h1>
+    <p>Вы уверены, что хотите удалить задачу "{{ object.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Удалить</button>
+        <a href="{% url 'task_list' %}" class="delete-link">Отмена</a>
+{% endblock %}
