@@ -19,10 +19,31 @@
                     <span class="task-date">{{ task.created_at|date:"d.m.Y H:i" }}</span>
                 </div>
                 <p>Задача на: {{ task.task_planned_effort|time_label }} | (подзадачи на: {{ task.subtask_planned_effort|time_label }})</p>
-                <p>Статус: {{ task.get_status_display }}</p>
+                <p>
+                    <form class="status-form" data-task-id="{{ task.pk }}" method="post" action="{% url 'update_task_status' task.pk %}">
+                        {% csrf_token %}
+                        <label for="status-select-{{ task.pk }}" class="status-label">
+                            Текущий статус: 
+                        </label>
+                        <select id="status-select-{{ task.pk }}" name="status" class="status-select">
+                            {% for status, status_display in task.STATUS_CHOICES %}
+                                <option value="{{ status }}" {% if status == task.status %}selected{% endif %}>
+                                    {{ status_display }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Обновить статус</button>
+                        <div class="status-message" id="status-message-{{ task.pk }}"></div>
+                    </form>
+                </p>
+                
+                              
+                
                 {% if task.status == 'completed' %}
-                    <p>Фактическое время выполнения: {{ task.task_actual_effort|time_label }}</p>
+                    <p>Была выполнена за: {{ task.total_actual_effort|time_label }}</p>
                 {% endif %}
+                
+
                 <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a>
                 {% if not task.subtasks.exists %}
                     <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
@@ -33,4 +54,44 @@
         {% endfor %}
     </ul>
     <a href="{% url 'create_task' %}">Создать новую задачу</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработчик отправки форм для обновления статуса
+    document.querySelectorAll('.status-form').forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Предотвращаем стандартное поведение формы
+            
+            const formData = new FormData(form);
+            const taskId = form.getAttribute('data-task-id');
+            const statusMessageDiv = document.getElementById('status-message-' + taskId);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessageDiv.textContent = data.message;
+                    statusMessageDiv.style.color = 'green';
+                } else {
+                    statusMessageDiv.textContent = data.message;
+                    statusMessageDiv.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                statusMessageDiv.textContent = 'Произошла ошибка.';
+                statusMessageDiv.style.color = 'red';
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

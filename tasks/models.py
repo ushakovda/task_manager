@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
+from django.db import transaction
 
 
 class Task(models.Model):
@@ -67,16 +68,38 @@ class Task(models.Model):
     def total_actual_effort(self):
         return self.calculate_efforts()['total_actual_effort']
 
-    def save(self, *args, **kwargs):  # Сохрание/обновление статуса задачи 
-        if self.status == "completed" and not self.completed_at:
-            self.completed_at = timezone.now()
-        elif self.status != "completed":
-            self.completed_at = None
-        super().save(*args, **kwargs)
-        for subtask in self.subtasks.all():
-            if self.status == "completed":
-                subtask.status = "completed"
-                subtask.save()
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if self.pk:
+                old_task = Task.objects.get(pk=self.pk)
+
+                # Проверяем допустимость перехода в новый статус
+                if not self.can_transition_to(self.status, old_task.status):
+                    raise ValidationError("Невозможно выполнить переход в указанный статус.")
+            
+                if self.status == 'completed':
+                    # Проверяем, что все подзадачи могут быть завершены
+                    if self.subtasks.exists():
+                        for subtask in self.subtasks.all():
+                            if not subtask.can_transition_to('completed', subtask.status):
+                                raise ValidationError("Не все подзадачи могут быть завершены.")
+
+            # Сначала сохраняем основную задачу
+            super().save(*args, **kwargs)
+
+            if self.status == 'completed':
+                # Завершаем все подзадачи
+                for subtask in self.subtasks.all():
+                    if subtask.status != 'completed':
+                        subtask.status = 'completed'
+                        subtask.save()
+
+    def can_transition_to(self, new_status, old_status):
+        if new_status == "completed":
+            return old_status == "in_progress"
+        elif new_status == "paused":
+            return old_status == "in_progress"
+        return True  # Допустимые переходы для других статусов
 
     def is_terminal(self):
         """Проверяет, является ли задача терминальной (т.е. не имеет подзадач)."""
