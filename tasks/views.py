@@ -60,12 +60,20 @@ class UpdateTaskStatusView(View):
         task = get_object_or_404(Task, pk=pk)
         new_status = request.POST.get('status')
 
+        # Проверяем, что новый статус допустим
         if new_status not in dict(Task.STATUS_CHOICES).keys():
             return JsonResponse({'success': False, 'message': 'Некорректный статус.'})
 
         try:
+            # Устанавливаем новый статус и сохраняем задачу
             task.status = new_status
             task.save()
-            return JsonResponse({'success': True, 'message': 'Статус обновлен успешно.'})
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Статус обновлен успешно.',
+                'new_status': task.status  # Возвращаем новый статус
+            })
         except ValidationError as e:
             return JsonResponse({'success': False, 'message': str(e)})
+        

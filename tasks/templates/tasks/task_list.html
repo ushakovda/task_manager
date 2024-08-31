@@ -37,12 +37,9 @@
                     </form>
                 </p>
                 
-                              
-                
                 {% if task.status == 'completed' %}
                     <p>Была выполнена за: {{ task.total_actual_effort|time_label }}</p>
                 {% endif %}
-                
 
                 <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a>
                 {% if not task.subtasks.exists %}
@@ -58,40 +55,57 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Обработчик отправки форм для обновления статуса
-    document.querySelectorAll('.status-form').forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Предотвращаем стандартное поведение формы
-            
-            const formData = new FormData(form);
-            const taskId = form.getAttribute('data-task-id');
-            const statusMessageDiv = document.getElementById('status-message-' + taskId);
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    statusMessageDiv.textContent = data.message;
-                    statusMessageDiv.style.color = 'green';
-                } else {
-                    statusMessageDiv.textContent = data.message;
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.status-form').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(form);
+                const taskId = form.getAttribute('data-task-id');
+                const statusMessageDiv = document.getElementById('status-message-' + taskId);
+                const statusSelect = form.querySelector('select[name="status"]');
+                const currentStatus = statusSelect.value; // Сохраняем текущее значение статуса
+    
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusMessageDiv.textContent = data.message;
+                        statusMessageDiv.style.color = 'green';
+                    } else {
+                        statusMessageDiv.textContent = data.message;
+                        statusMessageDiv.style.color = 'red';
+                        
+                        // Восстанавливаем значение текущего статуса в форме
+                        statusSelect.value = currentStatus;
+                    }
+    
+                    // Скрываем сообщение через 2 секунды
+                    setTimeout(() => {
+                        statusMessageDiv.textContent = '';
+                    }, 2000);
+                })
+                .catch(error => {
+                    statusMessageDiv.textContent = 'Произошла ошибка.';
                     statusMessageDiv.style.color = 'red';
-                }
-            })
-            .catch(error => {
-                statusMessageDiv.textContent = 'Произошла ошибка.';
-                statusMessageDiv.style.color = 'red';
+    
+                    // Восстанавливаем значение текущего статуса в форме
+                    statusSelect.value = currentStatus;
+                    
+                    // Скрываем сообщение через 2 секунды
+                    setTimeout(() => {
+                        statusMessageDiv.textContent = '';
+                    }, 2000);
+                });
             });
         });
     });
-});
-</script>
+    </script>     
 {% endblock %}

@@ -75,18 +75,23 @@ class Task(models.Model):
 
                 # Проверяем допустимость перехода в новый статус
                 if not self.can_transition_to(self.status, old_task.status):
-                    raise ValidationError("Невозможно выполнить переход в указанный статус.")
-            
+                    if old_task.status in ["completed", "paused", "deleted"]:
+                        raise ValidationError("Невозможно выполнить переход в указанный статус.")
+                    if self.status == 'completed':
+                        raise ValidationError("Сначала приступите к выполнению")
+                    elif self.status == 'paused':
+                        raise ValidationError("Задача ещё не выполняется")
+
                 if self.status == 'completed':
                     # Проверяем, что все подзадачи могут быть завершены
                     if self.subtasks.exists():
                         for subtask in self.subtasks.all():
                             if not subtask.can_transition_to('completed', subtask.status):
-                                raise ValidationError("Не все подзадачи могут быть завершены.")
-
+                                raise ValidationError("Есть незавершенные подзадачи.")
+            
             # Сначала сохраняем основную задачу
             super().save(*args, **kwargs)
-
+            
             if self.status == 'completed':
                 # Завершаем все подзадачи
                 for subtask in self.subtasks.all():
@@ -96,9 +101,13 @@ class Task(models.Model):
 
     def can_transition_to(self, new_status, old_status):
         if new_status == "completed":
+            if old_status in ["paused", "assigned"]:
+                return False  # Не можно завершить задачу из статусов "Приостановлена" или "Назначена"
             return old_status == "in_progress"
         elif new_status == "paused":
             return old_status == "in_progress"
+        elif new_status == "deleted":
+            return self.is_terminal()
         return True  # Допустимые переходы для других статусов
 
     def is_terminal(self):
