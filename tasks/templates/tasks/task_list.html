@@ -1,20 +1,28 @@
 {% extends "base.html" %}
 
+{% load custom_filters %}
+
 {% block header %}
     <title>Список задач</title>
 {% endblock %}
-    
+
 {% block content %}
     <h2>Список задач</h2>
     <ul>
         {% for task in tasks %}
             <li>
                 <div class="task-header">
-                    <a href="{% url 'edit_task' task.pk %}">{{ task.name }}</a>
+                    <a href="{% url 'edit_task' task.pk %}">
+                        {{ task.name }}
+                        <i class="fas fa-edit" title="Редактировать"></i>
+                    </a>
                     <span class="task-date">{{ task.created_at|date:"d.m.Y H:i" }}</span>
                 </div>
-                <p>Планируется: {{ task.calculated_planned_effort }} часов</p>
-                <p>Фактическое время: {{ task.calculated_actual_effort }} часов</p>
+                <p>Задача на: {{ task.task_planned_effort|time_label }} | (подзадачи на: {{ task.subtask_planned_effort|time_label }})</p>
+                <p>Статус: {{ task.get_status_display }}</p>
+                {% if task.status == 'completed' %}
+                    <p>Фактическое время выполнения: {{ task.task_actual_effort|time_label }}</p>
+                {% endif %}
                 <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a>
                 {% if not task.subtasks.exists %}
                     <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>

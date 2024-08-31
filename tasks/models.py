@@ -27,25 +27,45 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-    def calculate_efforts(self) -> dict: 
+    def calculate_efforts(self) -> dict:
         subtask_planned_effort = sum(
             subtask.planned_effort for subtask in self.subtasks.all()
-        )  # Вычисление суммарного планового время выполнения всех подзадач
+        )
         subtask_actual_effort = sum(
             subtask.actual_effort for subtask in self.subtasks.all()
-        )  # Вычисление суммарного фактического времени выполнения всех подзадач
+        )
         return {
-            "planned_effort": self.planned_effort + subtask_planned_effort,
-            "actual_effort": self.actual_effort + subtask_actual_effort,
+            "task_planned_effort": self.planned_effort,
+            "subtask_planned_effort": subtask_planned_effort,
+            "task_actual_effort": self.actual_effort,
+            "subtask_actual_effort": subtask_actual_effort,
+            "total_planned_effort": self.planned_effort + subtask_planned_effort,
+            "total_actual_effort": self.actual_effort + subtask_actual_effort,
         }
 
     @property
-    def calculated_planned_effort(self):
-        return self.calculate_efforts()['planned_effort']
+    def task_planned_effort(self):
+        return self.calculate_efforts()['task_planned_effort']
 
     @property
-    def calculated_actual_effort(self):
-        return self.calculate_efforts()['actual_effort']
+    def subtask_planned_effort(self):
+        return self.calculate_efforts()['subtask_planned_effort']
+
+    @property
+    def task_actual_effort(self):
+        return self.calculate_efforts()['task_actual_effort']
+
+    @property
+    def subtask_actual_effort(self):
+        return self.calculate_efforts()['subtask_actual_effort']
+
+    @property
+    def total_planned_effort(self):
+        return self.calculate_efforts()['total_planned_effort']
+
+    @property
+    def total_actual_effort(self):
+        return self.calculate_efforts()['total_actual_effort']
 
     def save(self, *args, **kwargs):  # Сохрание/обновление статуса задачи 
         if self.status == "completed" and not self.completed_at:
