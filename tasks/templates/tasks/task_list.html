@@ -8,50 +8,11 @@
 
 {% block content %}
     <h2>Список задач</h2>
-    <ul>
+    <ul id="task-tree">
         {% for task in tasks %}
-            <li>
-                <div class="task-header">
-                    <a href="{% url 'edit_task' task.pk %}">
-                        {{ task.name }}
-                        <i class="fas fa-edit" title="Редактировать"></i>
-                    </a>
-                    <span class="task-date">{{ task.created_at|date:"d.m.Y H:i" }}</span>
-                </div>
-                <p>Задача на: {{ task.task_planned_effort|time_label }} | (подзадачи на: {{ task.subtask_planned_effort|time_label }})</p>
-                <p>
-                    {% if task.status != 'completed' %}
-                    <form class="status-form" data-task-id="{{ task.pk }}" method="post" action="{% url 'update_task_status' task.pk %}">
-                        {% csrf_token %}
-                        <label for="status-select-{{ task.pk }}" class="status-label">
-                            Текущий статус: 
-                        </label>
-                        <select id="status-select-{{ task.pk }}" name="status" class="status-select">
-                            {% for status, status_display in task.STATUS_CHOICES %}
-                                <option value="{{ status }}" {% if status == task.status %}selected{% endif %}>
-                                    {{ status_display }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit">Обновить статус</button>
-                        <div class="status-message" id="status-message-{{ task.pk }}"></div>
-                    </form>
-                    {% else %}
-                        <span>Задача завершена.</span>
-                    {% endif %}
-                </p>
-                
-                {% if task.status == 'completed' %}
-                    <p>Была выполнена за: {{ task.total_actual_effort|time_label }}</p>
-                {% endif %}
-
-                <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a>
-                {% if not task.subtasks.exists %}
-                    <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
-                {% else %}
-                    <span class="note">* удалить нельзя, есть подзадачи</span>
-                {% endif %}
-            </li>
+            {% if not task.parent %}
+                {% include "tasks/task_tree_item.html" with task=task %}
+            {% endif %}
         {% endfor %}
     </ul>
     <a href="{% url 'create_task' %}">Создать новую задачу</a>
@@ -60,6 +21,22 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем функциональность для скрытия/показа подзадач
+        document.querySelectorAll('.toggle-subtasks').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const taskId = button.getAttribute('data-task-id');
+                const subtasks = document.getElementById('subtasks-' + taskId);
+                if (subtasks.style.display === 'none') {
+                    subtasks.style.display = 'block';
+                    button.textContent = 'Скрыть подзадачи';
+                } else {
+                    subtasks.style.display = 'none';
+                    button.textContent = button.getAttribute('data-count') + ' подзадачи(ей)';
+                }
+            });
+        });
+
+        // Обработка обновления статуса задачи
         document.querySelectorAll('.status-form').forEach(function(form) {
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -107,5 +84,5 @@
             });
         });
     });
-    </script>
+</script>
 {% endblock %}

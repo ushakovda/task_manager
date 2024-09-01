@@ -77,3 +77,19 @@ class UpdateTaskStatusView(View):
         except ValidationError as e:
             return JsonResponse({'success': False, 'message': str(e)})
         
+
+class UpdateActualEffortView(View):
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        actual_effort = request.POST.get('actual_effort')
+
+        if not actual_effort:
+            return JsonResponse({'success': False, 'message': 'Необходимо указать фактическое время.'})
+
+        try:
+            task.total_actual_effort = actual_effort
+            task.save()
+            return JsonResponse({'success': True, 'message': 'Фактическое время обновлено.'})
+        except ValidationError as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+        

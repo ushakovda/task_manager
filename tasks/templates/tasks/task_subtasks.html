@@ -1,0 +1,7 @@
+{% if task.subtasks.exists %}
+    <ul class="subtasks" id="subtasks-{{ task.pk }}" style="display:none;">
+        {% for subtask in task.subtasks.all %}
+            {% include "tasks/task_tree_item.html" with task=subtask %}
+        {% endfor %}
+    </ul>
+{% endif %}
