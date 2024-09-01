@@ -20,6 +20,7 @@
                 </div>
                 <p>Задача на: {{ task.task_planned_effort|time_label }} | (подзадачи на: {{ task.subtask_planned_effort|time_label }})</p>
                 <p>
+                    {% if task.status != 'completed' %}
                     <form class="status-form" data-task-id="{{ task.pk }}" method="post" action="{% url 'update_task_status' task.pk %}">
                         {% csrf_token %}
                         <label for="status-select-{{ task.pk }}" class="status-label">
@@ -35,6 +36,9 @@
                         <button type="submit">Обновить статус</button>
                         <div class="status-message" id="status-message-{{ task.pk }}"></div>
                     </form>
+                    {% else %}
+                        <span>Задача завершена.</span>
+                    {% endif %}
                 </p>
                 
                 {% if task.status == 'completed' %}
@@ -63,8 +67,7 @@
                 const formData = new FormData(form);
                 const taskId = form.getAttribute('data-task-id');
                 const statusMessageDiv = document.getElementById('status-message-' + taskId);
-                const statusSelect = form.querySelector('select[name="status"]');
-                const currentStatus = statusSelect.value; // Сохраняем текущее значение статуса
+                const statusSelect = document.getElementById('status-select-' + taskId);
     
                 fetch(form.action, {
                     method: 'POST',
@@ -79,33 +82,30 @@
                     if (data.success) {
                         statusMessageDiv.textContent = data.message;
                         statusMessageDiv.style.color = 'green';
+    
+                        // Если статус завершен, скрываем форму
+                        if (data.new_status === 'completed') {
+                            form.style.display = 'none';
+                            statusMessageDiv.textContent = 'Задача завершена.';
+                        }
                     } else {
                         statusMessageDiv.textContent = data.message;
                         statusMessageDiv.style.color = 'red';
-                        
-                        // Восстанавливаем значение текущего статуса в форме
-                        statusSelect.value = currentStatus;
+                        // Обновляем статус в выпадающем списке на текущий, если ошибка
+                        statusSelect.value = statusSelect.querySelector('option[selected]').value;
                     }
     
-                    // Скрываем сообщение через 2 секунды
+                    // Скрываем сообщение через 3.5 секунды
                     setTimeout(() => {
                         statusMessageDiv.textContent = '';
-                    }, 2000);
+                    }, 3500);
                 })
                 .catch(error => {
                     statusMessageDiv.textContent = 'Произошла ошибка.';
                     statusMessageDiv.style.color = 'red';
-    
-                    // Восстанавливаем значение текущего статуса в форме
-                    statusSelect.value = currentStatus;
-                    
-                    // Скрываем сообщение через 2 секунды
-                    setTimeout(() => {
-                        statusMessageDiv.textContent = '';
-                    }, 2000);
                 });
             });
         });
     });
-    </script>     
+    </script>
 {% endblock %}

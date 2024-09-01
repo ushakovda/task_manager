@@ -67,6 +67,10 @@ class Task(models.Model):
     @property
     def total_actual_effort(self):
         return self.calculate_efforts()['total_actual_effort']
+    
+    @total_actual_effort.setter
+    def total_actual_effort(self, value):
+        self._actual_effort = value
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
@@ -78,31 +82,28 @@ class Task(models.Model):
                     if old_task.status in ["completed", "paused", "deleted"]:
                         raise ValidationError("Невозможно выполнить переход в указанный статус.")
                     if self.status == 'completed':
-                        raise ValidationError("Сначала приступите к выполнению")
+                        raise ValidationError("Проверьте статус текущей задачи и подзадач, они должны выполняться")
                     elif self.status == 'paused':
                         raise ValidationError("Задача ещё не выполняется")
 
                 if self.status == 'completed':
-                    # Проверяем, что все подзадачи могут быть завершены
-                    if self.subtasks.exists():
-                        for subtask in self.subtasks.all():
-                            if not subtask.can_transition_to('completed', subtask.status):
-                                raise ValidationError("Есть незавершенные подзадачи.")
-            
+                    # Сначала завершаем все подзадачи
+                    for subtask in self.subtasks.all():
+                        if subtask.status != 'completed':
+                            subtask.status = 'completed'
+                            subtask.save()
+                    
+                    # Повторная проверка на завершение всех подзадач
+                    if self.subtasks.filter(status__in=['in_progress', 'assigned', 'paused']).exists():
+                        raise ValidationError("Есть незавершенные подзадачи.")
+
             # Сначала сохраняем основную задачу
             super().save(*args, **kwargs)
-            
-            if self.status == 'completed':
-                # Завершаем все подзадачи
-                for subtask in self.subtasks.all():
-                    if subtask.status != 'completed':
-                        subtask.status = 'completed'
-                        subtask.save()
 
     def can_transition_to(self, new_status, old_status):
         if new_status == "completed":
             if old_status in ["paused", "assigned"]:
-                return False  # Не можно завершить задачу из статусов "Приостановлена" или "Назначена"
+                return False  # Нельзя завершить задачу из статусов "Приостановлена" или "Назначена"
             return old_status == "in_progress"
         elif new_status == "paused":
             return old_status == "in_progress"
