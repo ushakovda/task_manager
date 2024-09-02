@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -30,7 +31,7 @@
                         button.textContent = 'Скрыть подзадачи';
                     } else {
                         subtasks.style.display = 'none';
-                        button.textContent = 'ещё ' + button.getAttribute('data-count') + ' шт';
+                        button.textContent = 'Количество подзадач:' + button.getAttribute('data-count');
                     }
                 });
             });
@@ -84,51 +85,54 @@
             });
         });
     </script>
-    <script>
-        $(document).ready(function() {
-            // Обработка клика по кнопке с глазом для отображения деталей задачи
-            $('.view-details').on('click', function() {
-                var taskId = $(this).data('task-id');
-        
-                $.ajax({
-                    url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'), 
-                    method: 'GET',
-                    success: function(data) {
-                        var detailsHtml = `
-                            <h3>${data.name}</h3>
-                            <p><strong>Описание:</strong> ${data.description}</p>
-                            <p><strong>Исполнители:</strong> ${data.performers}</p>
-                            <p><strong>Статус:</strong> ${data.status}</p>
-                            <p><strong>Плановая трудоёмкость:</strong> ${data.planned_effort}</p>
-                            <p><strong>Фактическое время выполнения:</strong> ${data.actual_effort}</p>
-                            <p><strong>Дата создания:</strong> ${data.created_at}</p>
-                            <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
-                        `;
-                        
-                        if (data.status === 'completed') {
-                            detailsHtml += `<p><strong>Была выполнена за:</strong> ${data.total_actual_effort}</p>`;
-                        }
 
-                        if (data.is_terminal) {
-                            detailsHtml += `
-                                <a href="/tasks/${taskId}/delete/">Удалить задачу</a>
-                            `;
-                        } else {
-                            detailsHtml += `<p>Нельзя удалить, есть подзадачи</p>`;
-                        }
+    <script>
+    $(document).ready(function() {
+        // Обработка клика по кнопке с глазом для отображения деталей задачи
+        $('.view-details').on('click', function() {
+            var taskId = $(this).data('task-id');
     
-                        // Добавляем кнопку "Создать подзадачу" в любом случае
-                        detailsHtml += `
-                            <a href="/tasks/${taskId}/create_subtask/">Создать подзадачу</a>
-                        `;
-        
-                        $('#details').html(detailsHtml);
-                    },
-                    error: function() {
-                        $('#details').html('<p>Ошибка загрузки данных.</p>');
+            $.ajax({
+                url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'), 
+                method: 'GET',
+                success: function(data) {
+                    var detailsHtml = `
+                        <h3>${data.name}</h3>
+                        <p><strong>Описание:</strong> ${data.description}</p>
+                        <p><strong>Исполнители:</strong> ${data.performers}</p>
+                        <p><strong>Статус:</strong> ${data.status}</p>
+                        <p><strong>Плановая трудоёмкость:</strong> ${data.planned_effort}</p>
+                        <p><strong>Фактическое время выполнения:</strong> ${data.actual_effort}</p>
+                        <p><strong>Дата создания:</strong> ${data.created_at}</p>
+                        <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
+                    `;
+                    
+                    if (data.status === 'completed') {
+                        detailsHtml += `<p class="completed-effort"><strong>Была выполнена за:</strong> ${data.total_actual_effort}</p>`;
                     }
-                });
+
+                    if (data.is_terminal) {
+                        detailsHtml += `
+                            <a class="delete-task" href="/tasks/${taskId}/delete/">Удалить задачу</a>
+                        `;
+                    } else {
+                        detailsHtml += `<p class="cannot-delete">Нельзя удалить, есть подзадачи</p>`;
+                    }
+    
+                    // Добавляем кнопку "Создать подзадачу" в любом случае
+                    detailsHtml += `
+                        <a href="/tasks/${taskId}/create_subtask/" class="btn btn-secondary create-subtask">Создать подзадачу</a>
+                    `;
+    
+                    $('#details').html(detailsHtml);
+                },
+                error: function() {
+                    $('#details').html('<p>Ошибка загрузки данных.</p>');
+                }
             });
         });
+    });
     </script>
+
+    
 </html>

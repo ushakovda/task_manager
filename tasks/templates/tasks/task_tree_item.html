@@ -6,11 +6,11 @@
             <i class="fas fa-edit" title="Редактировать"></i>
         </a>
         <button class="view-details" data-task-id="{{ task.pk }}">
-            <i class="fas fa-eye" title="Показать детали"></i>
+            <i class="fas fa-eye" title="Показать детали"></i>Описание
         </button>
         {% if task.subtasks.exists %}
             <button class="toggle-subtasks" data-task-id="{{ task.pk }}" data-count="{{ task.subtasks.count }}">
-                ещё {{ task.subtasks.count }}
+                Количество подзадач: {{ task.subtasks.count }} 
             </button>
         {% endif %}
     </div>
@@ -38,10 +38,10 @@
         {% endif %}
     </div>
 
-    {% comment %} {% if task.status == 'completed' %}
-        <p>Была выполнена за: {{ task.total_actual_effort }}</p>
+    {% if task.status == 'completed' %}
+        <p>Время выполнения: {{ task.total_actual_effort }} </p>
     {% endif %}
-     {% endcomment %}
+
 
     {% include "tasks/task_subtasks.html" with task=task %}
 </li>

@@ -1,5 +1,6 @@
+/* Установка Montserrat как шрифта по умолчанию для всего документа */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif; /* Устанавливаем Montserrat как основной шрифт */
     margin: 20px;
     background-color: #f4f4f4;
 }
@@ -7,6 +8,7 @@ body {
 ul {
     list-style-type: none;
     padding: 0;
+    font-family: 'Montserrat', sans-serif; /* Убедитесь, что шрифт применяется к спискам */
 }
 
 li {
@@ -16,11 +18,13 @@ li {
     padding: 15px;
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif; /* Убедитесь, что шрифт применяется к элементам списка */
 }
 
 a {
     text-decoration: none;
     color: #007bff;
+    font-family: 'Montserrat', sans-serif; /* Убедитесь, что шрифт применяется к ссылкам */
 }
 
 a:hover {
@@ -29,6 +33,7 @@ a:hover {
 
 .delete-link {
     color: #dc3545;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .delete-link:hover {
@@ -38,6 +43,7 @@ a:hover {
 .note {
     color: #6c757d;
     font-size: 0.9em;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-header {
@@ -45,36 +51,43 @@ a:hover {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-date {
     font-size: 0.9em;
     color: #777;
     white-space: nowrap;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .status-form {
     display: flex;
     align-items: center;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .status-label {
     margin-right: 10px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .status-select {
     margin-right: 10px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .status-message {
     margin-left: 10px;
     color: green;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .status-select {
     font-size: 14px;
     padding: 7px;
     width: 150px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 #container {
@@ -83,22 +96,26 @@ a:hover {
     background-color: #ffffff;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 #tree {
     width: 30%;
     border-right: 1px solid #ddd;
     padding: 10px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 #details {
     width: 70%;
     padding: 10px;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-item {
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-item:hover {
@@ -109,6 +126,7 @@ a:hover {
     color: #007bff;
     font-size: 1.1em;
     font-weight: bold;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-header button {
@@ -119,10 +137,11 @@ a:hover {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
 
 .task-header button:hover {
-    background-color: #0056b3;
+    background-color: #0015b3;
 }
 
 .toggle-subtasks {
@@ -131,4 +150,51 @@ a:hover {
 
 .toggle-subtasks:hover {
     background-color: #5a6268;
+}
+
+.view-details {
+    display: inline-flex; /* Используем inline-flex для того, чтобы иконка и текст располагались в одной строке */
+    align-items: center; /* Выравнивание по вертикали */
+    padding: 8px 16px; /* Внутренние отступы для увеличения ширины и высоты */
+    font-size: 14px; /* Размер шрифта для текста */
+    border: 1px solid #007bff; /* Граница кнопки */
+    border-radius: 5px; /* Скругление углов */
+    background-color: #007bff; /* Цвет фона кнопки */
+    color: #fff; /* Цвет текста и иконки */
+    cursor: pointer; /* Курсор в виде руки при наведении */
+    transition: background-color 0.3s, border-color 0.3s; /* Плавный переход цвета при наведении */
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
+}
+
+.view-details:hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+    border-color: #0056b3; /* Цвет границы при наведении */
+}
+
+.view-details i {
+    margin-right: 8px; /* Отступ между иконкой и текстом */
+}
+
+/* Стили для ссылки "Удалить задачу" */
+.delete-task {
+    color: #dc3545; /* Красный цвет текста */
+    font-weight: bold; /* Жирное начертание для выделения */
+    margin-right: 15px; /* Отступ справа для пространства между кнопками */
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
+}
+
+.delete-task:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+}
+
+.cannot-delete {
+    color: #dc3545; /* Красный цвет текста */
+    font-weight: bold; /* Жирное начертание для выделения */
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
+}
+
+/* Отступ для кнопки "Создать подзадачу" */
+.create-subtask {
+    display: inline-block; /* Отображение в строке */
+    font-family: 'Montserrat', sans-serif; /* Применение шрифта */
 }
