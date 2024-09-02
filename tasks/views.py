@@ -93,3 +93,21 @@ class UpdateActualEffortView(View):
         except ValidationError as e:
             return JsonResponse({'success': False, 'message': str(e)})
         
+
+class TaskDetailAjaxView(View):
+    def get(self, request, *args, **kwargs):
+        task_id = self.kwargs.get('pk')
+        task = get_object_or_404(Task, pk=task_id)
+        
+        data = {
+            'name': task.name,
+            'description': task.description,
+            'performers': task.performers,
+            'status': task.get_status_display(),
+            'planned_effort': task.planned_effort,
+            'actual_effort': task.actual_effort,
+            'created_at': task.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'completed_at': task.completed_at.strftime('%Y-%m-%d %H:%M:%S') if task.completed_at else '',
+            'is_terminal': task.is_terminal() 
+        }
+        return JsonResponse(data)

@@ -12,9 +12,78 @@
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     {% block content %}{% endblock %}
     {% block extra_js %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Добавляем функциональность для скрытия/показа подзадач
+            document.querySelectorAll('.toggle-subtasks').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const taskId = button.getAttribute('data-task-id');
+                    const subtasks = document.getElementById('subtasks-' + taskId);
+                    if (subtasks.style.display === 'none') {
+                        subtasks.style.display = 'block';
+                        button.textContent = 'Скрыть подзадачи';
+                    } else {
+                        subtasks.style.display = 'none';
+                        button.textContent = 'ещё ' + button.getAttribute('data-count') + ' шт';
+                    }
+                });
+            });
+    
+            // Обработка обновления статуса задачи
+            document.querySelectorAll('.status-form').forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const taskId = form.getAttribute('data-task-id');
+                    const statusMessageDiv = document.getElementById('status-message-' + taskId);
+                    const statusSelect = document.getElementById('status-select-' + taskId);
+        
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            statusMessageDiv.textContent = data.message;
+                            statusMessageDiv.style.color = 'green';
+        
+                            // Если статус завершен, скрываем форму
+                            if (data.new_status === 'completed') {
+                                form.style.display = 'none';
+                                statusMessageDiv.textContent = 'Задача завершена.';
+                            }
+                        } else {
+                            statusMessageDiv.textContent = data.message;
+                            statusMessageDiv.style.color = 'red';
+                            // Обновляем статус в выпадающем списке на текущий, если ошибка
+                            statusSelect.value = statusSelect.querySelector('option[selected]').value;
+                        }
+        
+                        // Скрываем сообщение через 3.5 секунды
+                        setTimeout(() => {
+                            statusMessageDiv.textContent = '';
+                        }, 3500);
+                    })
+                    .catch(error => {
+                        statusMessageDiv.textContent = 'Произошла ошибка.';
+                        statusMessageDiv.style.color = 'red';
+                    });
+                });
+            });
+        });
+    </script>
+    
 </body>
 </html>

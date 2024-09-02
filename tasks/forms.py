@@ -4,7 +4,7 @@ from .models import Task
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['name', 'description', 'performers', 'status', 'planned_effort', 'actual_effort', 'parent', 'created_at']
+        fields = ['parent', 'name', 'description', 'performers', 'status', 'planned_effort', 'actual_effort', 'created_at']
         labels = {
             'name': 'Название',
             'description': 'Описание',

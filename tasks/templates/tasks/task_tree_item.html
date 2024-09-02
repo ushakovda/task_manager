@@ -5,14 +5,16 @@
             {{ task.name }}
             <i class="fas fa-edit" title="Редактировать"></i>
         </a>
-        <span class="task-date">{{ task.created_at|date:"d.m.Y H:i" }}</span>
+        <button class="view-details" data-task-id="{{ task.pk }}">
+            <i class="fas fa-eye" title="Показать детали"></i>
+        </button>
         {% if task.subtasks.exists %}
             <button class="toggle-subtasks" data-task-id="{{ task.pk }}" data-count="{{ task.subtasks.count }}">
-                {{ task.subtasks.count }}subtasks
+                ещё {{ task.subtasks.count }}
             </button>
         {% endif %}
     </div>
-    <p>Задача на: {{ task.task_planned_effort }} | (подзадачи на: {{ task.subtask_planned_effort }})</p>
+    {% comment %} <p>Задача на: {{ task.task_planned_effort }} | (подзадачи на: {{ task.subtask_planned_effort }})</p> {% endcomment %}
     
     <div class="task-status">
         {% if task.status != 'completed' %}
@@ -36,16 +38,53 @@
         {% endif %}
     </div>
 
-    {% if task.status == 'completed' %}
+    {% comment %} {% if task.status == 'completed' %}
         <p>Была выполнена за: {{ task.total_actual_effort }}</p>
     {% endif %}
 
-    <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a>
-    {% if not task.subtasks.exists %}
+    <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a> {% endcomment %}
+    {% comment %} {% if not task.subtasks.exists %}
         <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
     {% else %}
         <span class="note">* удалить нельзя, есть подзадачи</span>
-    {% endif %}
+    {% endif %} {% endcomment %}
 
     {% include "tasks/task_subtasks.html" with task=task %}
 </li>
+
+<script>
+    $(document).ready(function() {
+        // Обработка клика по кнопке с глазом для отображения деталей задачи
+        $('.view-details').on('click', function() {
+            var taskId = $(this).data('task-id');
+    
+            $.ajax({
+                url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'), 
+                method: 'GET',
+                success: function(data) {
+                    var detailsHtml = `
+                        <h3>${data.name}</h3>
+                        <p><strong>Описание:</strong> ${data.description}</p>
+                        <p><strong>Исполнители:</strong> ${data.performers}</p>
+                        <p><strong>Статус:</strong> ${data.status}</p>
+                        <p><strong>Плановая трудоёмкость:</strong> ${data.planned_effort}</p>
+                        <p><strong>Фактическое время выполнения:</strong> ${data.actual_effort}</p>
+                        <p><strong>Дата создания:</strong> ${data.created_at}</p>
+                        <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
+                    `;
+    
+                    if (data.is_terminal) {
+                        detailsHtml += `<a href="/tasks/${taskId}/delete/">Удалить задачу</a>`;
+                    } else {
+                        detailsHtml += `<p>Нельзя удалить, есть подзадачи</p>`;
+                    }
+    
+                    $('#details').html(detailsHtml);
+                },
+                error: function() {
+                    $('#details').html('<p>Ошибка загрузки данных.</p>');
+                }
+            });
+        });
+    });
+</script>

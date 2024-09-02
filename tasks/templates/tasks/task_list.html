@@ -7,110 +7,45 @@
 {% endblock %}
 
 {% block content %}
-<div id="container">
 
+<div id="container">
+    <!-- Дерево задач -->
     <div id="tree">
-        <ul id="task-tree">
-            <h2>Список задач</h2>
-            {% for task in tasks %}
-                {% if not task.parent %}
-                    {% include "tasks/task_tree_item.html" with task=task %}
-                {% endif %}
-            {% endfor %}
-        </ul>
+        <h2>Список задач</h2>
+        {% if tasks %}
+            <ul id="task-tree">
+                {% for task in tasks %}
+                    {% if not task.parent %}
+                        {% include "tasks/task_tree_item.html" with task=task %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Можно отдыхать, задач нет</p>
+        {% endif %}
         <a href="{% url 'create_task' %}">Создать новую задачу</a>
     </div>
 
+    <!--Подробная информация о задаче-->
     <div id="details">
         {% if selected_task %}
             <h3>{{ selected_task.name }}</h3>
-            <p><strong>Описание:</strong> {{ selected_task.description }}</p>
-            <p><strong>Исполнители:</strong> {{ selected_task.performers }}</p>
-            <p><strong>Статус:</strong> {{ selected_task.get_status_display }}</p>
-            <p><strong>Плановая трудоёмкость:</strong> {{ selected_task.planned_effort }}</p>
-            <p><strong>Фактическое время выполнения:</strong> {{ selected_task.actual_effort }}</p>
-            <p><strong>Дата создания:</strong> {{ selected_task.created_at }}</p>
-            <p><strong>Дата завершения:</strong> {{ selected_task.completed_at }}</p>
+            <p>Описание: {{ selected_task.description }}</p>
+            <p>Исполнители: {{ selected_task.performers }}</p>
+            <p>Статус: {{ selected_task.get_status_display }}</p>
+            <p>Плановая трудоёмкость: {{ selected_task.planned_effort }}</p>
+            <p>Фактическое время выполнения: {{ selected_task.actual_effort }}</p>
+            <p>Дата создания: {{ selected_task.created_at }}</p>
+            <p>Дата завершения: {{ selected_task.completed_at }}</p>
             {% if selected_task.is_terminal %}
-                <a href="{% url 'task_delete' selected_task.id %}">Удалить задачу</a>
+            <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
             {% else %}
                 <p>Нельзя удалить, есть подзадачи</p>
             {% endif %}
-        {% else %}
+        {% elif tasks %}
             <p>Выберите задачу для просмотра деталей.</p>
         {% endif %}
     </div>
-
 </div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Добавляем функциональность для скрытия/показа подзадач
-        document.querySelectorAll('.toggle-subtasks').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const taskId = button.getAttribute('data-task-id');
-                const subtasks = document.getElementById('subtasks-' + taskId);
-                if (subtasks.style.display === 'none') {
-                    subtasks.style.display = 'block';
-                    button.textContent = 'Скрыть подзадачи';
-                } else {
-                    subtasks.style.display = 'none';
-                    button.textContent = 'ещё ' + button.getAttribute('data-count') + ' шт';
-                }
-            });
-        });
-
-        // Обработка обновления статуса задачи
-        document.querySelectorAll('.status-form').forEach(function(form) {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const formData = new FormData(form);
-                const taskId = form.getAttribute('data-task-id');
-                const statusMessageDiv = document.getElementById('status-message-' + taskId);
-                const statusSelect = document.getElementById('status-select-' + taskId);
-    
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        statusMessageDiv.textContent = data.message;
-                        statusMessageDiv.style.color = 'green';
-    
-                        // Если статус завершен, скрываем форму
-                        if (data.new_status === 'completed') {
-                            form.style.display = 'none';
-                            statusMessageDiv.textContent = 'Задача завершена.';
-                        }
-                    } else {
-                        statusMessageDiv.textContent = data.message;
-                        statusMessageDiv.style.color = 'red';
-                        // Обновляем статус в выпадающем списке на текущий, если ошибка
-                        statusSelect.value = statusSelect.querySelector('option[selected]').value;
-                    }
-    
-                    // Скрываем сообщение через 3.5 секунды
-                    setTimeout(() => {
-                        statusMessageDiv.textContent = '';
-                    }, 3500);
-                })
-                .catch(error => {
-                    statusMessageDiv.textContent = 'Произошла ошибка.';
-                    statusMessageDiv.style.color = 'red';
-                });
-            });
-        });
-    });
-</script>
 
 {% endblock %}
