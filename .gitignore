@@ -2,11 +2,9 @@
 venv/
 .pylintrc
 __pycache__/
-
+.pytest_cache
+staticfiles
 
 #ide stuff
 .vscode
 
-
-#django stuff
-db.sqlite3
