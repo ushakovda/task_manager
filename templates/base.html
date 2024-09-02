@@ -84,6 +84,47 @@
             });
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            // Обработка клика по кнопке с глазом для отображения деталей задачи
+            $('.view-details').on('click', function() {
+                var taskId = $(this).data('task-id');
+        
+                $.ajax({
+                    url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'), 
+                    method: 'GET',
+                    success: function(data) {
+                        var detailsHtml = `
+                            <h3>${data.name}</h3>
+                            <p><strong>Описание:</strong> ${data.description}</p>
+                            <p><strong>Исполнители:</strong> ${data.performers}</p>
+                            <p><strong>Статус:</strong> ${data.status}</p>
+                            <p><strong>Плановая трудоёмкость:</strong> ${data.planned_effort}</p>
+                            <p><strong>Фактическое время выполнения:</strong> ${data.actual_effort}</p>
+                            <p><strong>Дата создания:</strong> ${data.created_at}</p>
+                            <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
+                        `;
+        
+                        if (data.is_terminal) {
+                            detailsHtml += `
+                                <a href="/tasks/${taskId}/delete/">Удалить задачу</a>
+                            `;
+                        } else {
+                            detailsHtml += `<p>Нельзя удалить, есть подзадачи</p>`;
+                        }
     
-</body>
+                        // Добавляем кнопку "Создать подзадачу" в любом случае
+                        detailsHtml += `
+                            <a href="/tasks/${taskId}/create_subtask/">Создать подзадачу</a>
+                        `;
+        
+                        $('#details').html(detailsHtml);
+                    },
+                    error: function() {
+                        $('#details').html('<p>Ошибка загрузки данных.</p>');
+                    }
+                });
+            });
+        });
+    </script>
 </html>

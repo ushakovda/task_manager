@@ -37,11 +37,14 @@
             <p>Фактическое время выполнения: {{ selected_task.actual_effort }}</p>
             <p>Дата создания: {{ selected_task.created_at }}</p>
             <p>Дата завершения: {{ selected_task.completed_at }}</p>
+
             {% if selected_task.is_terminal %}
             <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
+
             {% else %}
                 <p>Нельзя удалить, есть подзадачи</p>
             {% endif %}
+            
         {% elif tasks %}
             <p>Выберите задачу для просмотра деталей.</p>
         {% endif %}
