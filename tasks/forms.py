@@ -6,13 +6,13 @@ class TaskForm(forms.ModelForm):
         model = Task
         fields = ['parent', 'name', 'description', 'performers', 'status', 'planned_effort', 'actual_effort', 'created_at']
         labels = {
+            'parent': 'Родительская задача',
             'name': 'Название',
             'description': 'Описание',
             'performers': 'Исполнители',
             'status': 'Статус',
             'planned_effort': 'Плановая трудоёмкость задачи',
             'actual_effort': 'Фактическое время выполнения',
-            'parent': 'Родительская задача',
             'created_at': 'Дата и время создания',
         }
 

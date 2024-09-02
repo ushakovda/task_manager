@@ -104,7 +104,11 @@
                             <p><strong>Дата создания:</strong> ${data.created_at}</p>
                             <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
                         `;
-        
+                        
+                        if (data.status === 'completed') {
+                            detailsHtml += `<p><strong>Была выполнена за:</strong> ${data.total_actual_effort}</p>`;
+                        }
+
                         if (data.is_terminal) {
                             detailsHtml += `
                                 <a href="/tasks/${taskId}/delete/">Удалить задачу</a>

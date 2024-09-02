@@ -1,6 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
+    background-color: #f4f4f4;
 }
 
 ul {
@@ -11,9 +12,10 @@ ul {
 li {
     border: 1px solid #ddd;
     border-radius: 5px;
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 a {
@@ -40,8 +42,9 @@ a:hover {
 
 .task-header {
     display: flex;
-    /* justify-content: space-between; */
+    justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .task-date {
@@ -52,54 +55,80 @@ a:hover {
 
 .status-form {
     display: flex;
-    align-items: center; /* Выравнивание по вертикали */
+    align-items: center;
 }
 
 .status-label {
-    margin-right: 10px; /* Отступ справа для отделения текста от селекта */
+    margin-right: 10px;
 }
 
 .status-select {
-    margin-right: 10px; /* Отступ справа для отделения селекта от кнопки */
+    margin-right: 10px;
 }
 
 .status-message {
-    margin-left: 10px; /* Отступ слева для отделения сообщения от формы */
-    color: green; /* Цвет сообщения (можете изменить на нужный) */
+    margin-left: 10px;
+    color: green;
 }
 
 .status-select {
-    font-size: 14px; /* Размер шрифта */
-    padding: 7px;    /* Отступы внутри элемента */
-    width: 150px;    /* Ширина элемента */
+    font-size: 14px;
+    padding: 7px;
+    width: 150px;
 }
 
-.task-container {
+#container {
     display: flex;
+    gap: 20px; /* Добавляет пространство между блоками */
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.task-list {
-    width: 30%; /* или 40%, по вашему выбору */
+#tree {
+    width: 30%;
     border-right: 1px solid #ddd;
     padding: 10px;
 }
 
-.task-details {
-    width: 70%; /* или 60%, по вашему выбору */
+#details {
+    width: 70%;
     padding: 10px;
 }
 
 .task-item {
     cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
 
-
-#container {
-    display: flex;
+.task-item:hover {
+    background-color: #f0f0f0;
 }
 
-#tree {
-    width: 40%; /* Устанавливает ширину блока дерева задач на 30% от доступного пространства */
-    border-right: 1px solid #ddd; /* Добавляет правую границу серого цвета */
-    padding: 10px; /* Добавляет внутренние отступы вокруг содержимого */
+.task-header a {
+    color: #007bff;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.task-header button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.task-header button:hover {
+    background-color: #0056b3;
+}
+
+.toggle-subtasks {
+    background-color: #6c757d;
+}
+
+.toggle-subtasks:hover {
+    background-color: #5a6268;
 }

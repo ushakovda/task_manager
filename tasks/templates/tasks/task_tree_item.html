@@ -41,13 +41,7 @@
     {% comment %} {% if task.status == 'completed' %}
         <p>Была выполнена за: {{ task.total_actual_effort }}</p>
     {% endif %}
-
-    <a href="{% url 'create_subtask' task.pk %}">Создать подзадачу</a> {% endcomment %}
-    {% comment %} {% if not task.subtasks.exists %}
-        <a class="delete-link" href="{% url 'delete_task' task.pk %}">Удалить</a>
-    {% else %}
-        <span class="note">* удалить нельзя, есть подзадачи</span>
-    {% endif %} {% endcomment %}
+     {% endcomment %}
 
     {% include "tasks/task_subtasks.html" with task=task %}
 </li>
