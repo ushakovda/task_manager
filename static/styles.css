@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.delete-link {
+    color: #dc3545;
+}
+
+.delete-link:hover {
+    text-decoration: underline;
+}
+
+.note {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-date {
+    font-size: 0.9em;
+    color: #777;
+    white-space: nowrap;
+}
+
+.status-form {
+    display: flex;
+    align-items: center; /* Выравнивание по вертикали */
+}
+
+.status-label {
+    margin-right: 10px; /* Отступ справа для отделения текста от селекта */
+}
+
+.status-select {
+    margin-right: 10px; /* Отступ справа для отделения селекта от кнопки */
+}
+
+.status-message {
+    margin-left: 10px; /* Отступ слева для отделения сообщения от формы */
+    color: green; /* Цвет сообщения (можете изменить на нужный) */
+}
+
+.status-select {
+    font-size: 14px; /* Размер шрифта */
+    padding: 7px;    /* Отступы внутри элемента */
+    width: 150px;    /* Ширина элемента */
+}
+
+.task-container {
+    display: flex;
+}
+
+.task-list {
+    width: 30%; /* или 40%, по вашему выбору */
+    border-right: 1px solid #ddd;
+    padding: 10px;
+}
+
+.task-details {
+    width: 70%; /* или 60%, по вашему выбору */
+    padding: 10px;
+}
+
+.task-item {
+    cursor: pointer;
+}
+
+
+#container {
+    display: flex;
+}
+
+#tree {
+    width: 40%; /* Устанавливает ширину блока дерева задач на 30% от доступного пространства */
+    border-right: 1px solid #ddd; /* Добавляет правую границу серого цвета */
+    padding: 10px; /* Добавляет внутренние отступы вокруг содержимого */
+}

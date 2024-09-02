@@ -3,19 +3,46 @@
 {% load custom_filters %}
 
 {% block header %}
-    <title>Список задач</title>
+    Список задач
 {% endblock %}
 
 {% block content %}
-    <h2>Список задач</h2>
-    <ul id="task-tree">
-        {% for task in tasks %}
-            {% if not task.parent %}
-                {% include "tasks/task_tree_item.html" with task=task %}
+<div id="container">
+
+    <div id="tree">
+        <ul id="task-tree">
+            <h2>Список задач</h2>
+            {% for task in tasks %}
+                {% if not task.parent %}
+                    {% include "tasks/task_tree_item.html" with task=task %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <a href="{% url 'create_task' %}">Создать новую задачу</a>
+    </div>
+
+    <div id="details">
+        {% if selected_task %}
+            <h3>{{ selected_task.name }}</h3>
+            <p><strong>Описание:</strong> {{ selected_task.description }}</p>
+            <p><strong>Исполнители:</strong> {{ selected_task.performers }}</p>
+            <p><strong>Статус:</strong> {{ selected_task.get_status_display }}</p>
+            <p><strong>Плановая трудоёмкость:</strong> {{ selected_task.planned_effort }}</p>
+            <p><strong>Фактическое время выполнения:</strong> {{ selected_task.actual_effort }}</p>
+            <p><strong>Дата создания:</strong> {{ selected_task.created_at }}</p>
+            <p><strong>Дата завершения:</strong> {{ selected_task.completed_at }}</p>
+            {% if selected_task.is_terminal %}
+                <a href="{% url 'task_delete' selected_task.id %}">Удалить задачу</a>
+            {% else %}
+                <p>Нельзя удалить, есть подзадачи</p>
             {% endif %}
-        {% endfor %}
-    </ul>
-    <a href="{% url 'create_task' %}">Создать новую задачу</a>
+        {% else %}
+            <p>Выберите задачу для просмотра деталей.</p>
+        {% endif %}
+    </div>
+
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -31,7 +58,7 @@
                     button.textContent = 'Скрыть подзадачи';
                 } else {
                     subtasks.style.display = 'none';
-                    button.textContent = button.getAttribute('data-count') + ' подзадачи(ей)';
+                    button.textContent = 'ещё ' + button.getAttribute('data-count') + ' шт';
                 }
             });
         });
@@ -85,4 +112,5 @@
         });
     });
 </script>
+
 {% endblock %}

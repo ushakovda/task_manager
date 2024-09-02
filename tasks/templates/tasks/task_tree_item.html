@@ -8,7 +8,7 @@
         <span class="task-date">{{ task.created_at|date:"d.m.Y H:i" }}</span>
         {% if task.subtasks.exists %}
             <button class="toggle-subtasks" data-task-id="{{ task.pk }}" data-count="{{ task.subtasks.count }}">
-                {{ task.subtasks.count }} подзадачи(ей)
+                {{ task.subtasks.count }}subtasks
             </button>
         {% endif %}
     </div>
