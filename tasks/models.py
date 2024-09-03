@@ -17,8 +17,8 @@ class Task(models.Model):
     performers: str = models.CharField(max_length=255, blank=True)  # Список исполнителей в виде строки
     created_at: timezone.datetime = models.DateTimeField(default=timezone.now)  # Дата и время создания
     status: str = models.CharField(max_length=50, choices=STATUS_CHOICES, default="assigned")  # Статус 
-    planned_effort: float = models.FloatField(default=0.0)  # Плановое время выполнения
-    actual_effort: float = models.FloatField(default=0.0)  # Фактическое время
+    planned_effort: float = models.DecimalField(default=0.0)  # Плановое время выполнения
+    actual_effort: float = models.DecimalField(default=0.0)  # Фактическое время
     completed_at: Optional[timezone.datetime] = models.DateTimeField(null=True, blank=True)  # Дата завершения (опционально)
 
     parent: Optional["Task"] = models.ForeignKey(
@@ -90,7 +90,7 @@ class Task(models.Model):
                 if old_task.status != 'completed' and self.status == 'completed':
                     if self.subtasks.filter(status__in=['in_progress', 'assigned']).exists():
                         raise ValidationError("Есть незавершенные подзадачи.")
-                
+            
                 # Проверяем допустимость перехода в новый статус
                 if not self.can_transition_to(self.status, old_task.status):
                     if old_task.status in ["completed", "paused", "deleted"]:
@@ -110,9 +110,14 @@ class Task(models.Model):
                     # Повторная проверка на завершение всех подзадач
                     if self.subtasks.filter(status__in=['in_progress', 'assigned', 'paused']).exists():
                         raise ValidationError("Есть незавершенные подзадачи.")
-
+                    
+                    # Устанавливаем дату завершения
+                    if not self.completed_at:
+                        self.completed_at = timezone.now()
+                        
             # Сначала сохраняем основную задачу
             super().save(*args, **kwargs)
+
 
     def can_transition_to(self, new_status: str, old_status: str) -> bool:
         """

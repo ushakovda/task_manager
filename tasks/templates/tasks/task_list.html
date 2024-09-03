@@ -32,11 +32,11 @@
             <p><strong>Описание:</strong> {{ selected_task.description }}</p>
             <p><strong>Исполнители:</strong> {{ selected_task.performers }}</p>
             <p><strong>Статус:</strong> {{ selected_task.get_status_display }}</p>
-            <p><strong>Плановая трудоёмкость:</strong> {{ selected_task.planned_effort }}</p>
-            <p><strong>Фактическое время выполнения:</strong> {{ selected_task.actual_effort }}</p>
+            <p><strong>Плановая трудоёмкость:</strong> {{ selected_task.planned_effort|time_label }}</p>
+            <p><strong>Фактическое время выполнения:</strong> {{ selected_task.actual_effort|time_label }}</p>
             <p><strong>Дата создания:</strong> {{ selected_task.created_at }}</p>
-            <p><strong>Дата завершения:</strong> {{ selected_task.completed_at }}</p>
-
+            <p><strong>Дата завершения:</strong> {{ selected_task.completed_at|time_label }}</p>
+    
             {% if selected_task.is_terminal %}
                 <a class="delete-link" href="{% url 'delete_task' selected_task.id %}">Удалить</a>
             {% else %}

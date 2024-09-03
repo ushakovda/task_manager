@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -87,51 +86,76 @@
     </script>
 
     <script>
-    $(document).ready(function() {
-        // Обработка клика по кнопке с глазом для отображения деталей задачи
-        $('.view-details').on('click', function() {
-            var taskId = $(this).data('task-id');
+        $(document).ready(function() {
+            // Обработка клика по кнопке с глазом для отображения деталей задачи
+            $('.view-details').on('click', function() {
+                var taskId = $(this).data('task-id');
     
-            $.ajax({
-                url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'), 
-                method: 'GET',
-                success: function(data) {
-                    var detailsHtml = `
-                        <h3>${data.name}</h3>
-                        <p><strong>Описание:</strong> ${data.description}</p>
-                        <p><strong>Исполнители:</strong> ${data.performers}</p>
-                        <p><strong>Статус:</strong> ${data.status}</p>
-                        <p><strong>Плановая трудоёмкость:</strong> ${data.planned_effort} ч.</p>
-                        <p><strong>Фактическое время выполнения:</strong> ${data.actual_effort} ч.</p>
-                        <p><strong>Дата создания:</strong> ${data.created_at}</p>
-                        <p><strong>Дата завершения:</strong> ${data.completed_at}</p>
-                    `;
-                    
-                    if (data.status === 'completed') {
-                        detailsHtml += `<p class="completed-effort"><strong>Была выполнена за:</strong> ${data.total_actual_effort}</p>`;
-                    }
-
-                    if (data.is_terminal) {
-                        detailsHtml += `
-                            <a class="delete-task" href="/tasks/${taskId}/delete/">Удалить задачу</a>
+                $.ajax({
+                    url: "{% url 'task_details' 0 %}".replace('/0/', '/' + taskId + '/'),
+                    method: 'GET',
+                    success: function(data) {
+                        console.log(data); // Вывод данных в консоль для отладки
+    
+                        // Функция для форматирования времени
+                        function timeLabel(totalHours) {
+                            var hours = Math.floor(totalHours); // Целое число часов
+                            var minutes = Math.round((totalHours - hours) * 60); // Оставшиеся минуты
+    
+                            // Определение падежа для часов
+                            var hoursStr = hours + (hours === 1 ? ' час' : (hours >= 2 && hours <= 4 ? ' часа' : ' часов'));
+    
+                            // Определение падежа для минут
+                            var minutesStr = minutes + (minutes === 1 ? ' минута' : (minutes >= 2 && minutes <= 4 ? ' минуты' : ' минут'));
+    
+                            // Возвращаем строку с часами и минутами
+                            if (hours > 0 && minutes > 0) {
+                                return hoursStr + ' ' + minutesStr;
+                            } else if (hours > 0) {
+                                return hoursStr;
+                            } else if (minutes > 0) {
+                                return minutesStr;
+                            } else {
+                                return '0 минут';
+                            }
+                        }
+    
+                        var detailsHtml = `
+                            <h3>${data.name}</h3>
+                            <p><strong>Описание:</strong> ${data.description}</p>
+                            <p><strong>Исполнители:</strong> ${data.performers}</p>
+                            <p><strong>Статус:</strong> ${data.status}</p>
+                            <p><strong>Плановая трудоёмкость:</strong> ${timeLabel(data.planned_effort)}</p>
+                            <p><strong>Фактическое время выполнения:</strong> ${timeLabel(data.actual_effort)}</p>
+                            <p><strong>Дата создания:</strong> ${data.created_at}</p>
+                            <p><strong>Дата завершения:</strong> ${data.completed_at || 'Не установлена'}</p>
                         `;
-                    } else {
-                        detailsHtml += `<p class="cannot-delete">Нельзя удалить, есть подзадачи</p>`;
+    
+                        if (data.status === 'completed') {
+                            detailsHtml += `<p class="completed-effort"><strong>Была выполнена за:</strong> ${timeLabel(data.total_actual_effort)}</p>`;
+                        }
+    
+                        if (data.is_terminal) {
+                            detailsHtml += `
+                                <a class="delete-task" href="/tasks/${taskId}/delete/">Удалить задачу</a>
+                            `;
+                        } else {
+                            detailsHtml += `<p class="cannot-delete">Нельзя удалить, есть подзадачи</p>`;
+                        }
+    
+                        // Добавляем кнопку "Создать подзадачу" в любом случае
+                        detailsHtml += `
+                            <a href="/tasks/${taskId}/create_subtask/" class="btn btn-secondary create-subtask">Создать подзадачу</a>
+                        `;
+    
+                        $('#details').html(detailsHtml);
+                    },
+                    error: function() {
+                        $('#details').html('<p>Ошибка загрузки данных.</p>');
                     }
-    
-                    // Добавляем кнопку "Создать подзадачу" в любом случае
-                    detailsHtml += `
-                        <a href="/tasks/${taskId}/create_subtask/" class="btn btn-secondary create-subtask">Создать подзадачу</a>
-                    `;
-    
-                    $('#details').html(detailsHtml);
-                },
-                error: function() {
-                    $('#details').html('<p>Ошибка загрузки данных.</p>');
-                }
+                });
             });
         });
-    });
     </script>
 
     
