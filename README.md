@@ -8,7 +8,7 @@
 
 1. Клонируйте репозиторий на вашу локальную машину:
 
-git clone <URL-вашего-репозитория>
+git clone <[URL-вашего-репозитория](https://github.com/ushakovda/task_manager)>
 cd <папка-с-проектом>
 
 2. Запустите проект с помощью Docker Compose:
